@@ -2,7 +2,7 @@
 name = "twitter"
 version = "0.1.0"
 description = "Fully featured twitter core clone"
-authors = ["Your Name <you@example.com>"]
+authors = ["n-freman <nazarannanazarov@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
@@ -12,6 +12,8 @@ python = ">=3.9"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.12.0"
+ruff = "^0.0.272"
+pytest = "^7.3.2"
 
 [build-system]
 requires = ["poetry-core"]

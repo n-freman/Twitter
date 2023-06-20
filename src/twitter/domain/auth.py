@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TypeAlias
 
-URL: TypeAlias = str
+from .types import URL
 
 
 @dataclass
