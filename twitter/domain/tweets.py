@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from .types import URL
 
@@ -9,10 +9,10 @@ class Tweet:
     id: int
     user_id: int
     content: str
-    quote_of: int | None = None # ID of tweet which is quoted by current tweet
-    reply_to: int | None = None # ID of tweet to which this one replies
     date_created: datetime
     date_edited: datetime
+    quote_of: int | None = None # ID of tweet which is quoted by current tweet
+    reply_to: int | None = None # ID of tweet to which this one replies
     previous_on_thread: int | None = None # ID of previous tweet on thread
 
 
