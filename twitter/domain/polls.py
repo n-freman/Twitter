@@ -19,5 +19,5 @@ class Choice:
 class Answer:
     user_id: int
     poll_id: int
-    answer_number: int
+    choice_number: int
     date_created: datetime

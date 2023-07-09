@@ -23,3 +23,5 @@ MANIFEST
 htmlcov/*
 .pytest_cache
 .coverage
+.DS_Store
+db.sqlite3
