@@ -9,7 +9,7 @@ mapper = registry()
 user_table = Table(
     "user",
     metadata,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, autoincrement=True, primary_key=True),
     Column("first_name", String(120)),
     Column("last_name", String(120)),
     Column("username", String(120)),
@@ -38,7 +38,7 @@ follow_table = Table(
 tweet_table = Table(
     "tweet",
     metadata,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, autoincrement=True, primary_key=True),
     Column("user_id", ForeignKey("user.id")),
     Column("content", String(240)),
     Column("date_created", DateTime),
@@ -51,7 +51,7 @@ tweet_table = Table(
 media_table = Table(
     "media",
     metadata,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, autoincrement=True, primary_key=True),
     Column("tweet_id", ForeignKey("tweet.id")),
     Column("file_path", String(120))
 )
