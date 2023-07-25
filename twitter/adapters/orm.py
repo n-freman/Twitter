@@ -99,4 +99,3 @@ def start_mappers():
     mapper.map_imperatively(domain.Poll, poll_table)
     mapper.map_imperatively(domain.Choice, choice_table)
     mapper.map_imperatively(domain.Answer, answer_table)
-
