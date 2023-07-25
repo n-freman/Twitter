@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  api:
+    build: .
+    command: uvicorn twitter.entrypoints.fastapi_app:app --port 8000 --reload --host 0.0.0.0
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    ports:
+      - 8080:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+
+volumes:
+  postgres_data:
