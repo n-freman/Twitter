@@ -14,6 +14,13 @@ repos:
         language: system
         types: [python]
 
+      - id: isort
+        description: Sort & format imports in propper way
+        entry: isort
+        name: Check imports order
+        language: system
+        types: [python]
+
       # https://github.com/pre-commit/pre-commit-hooks#check-added-large-files
       - id: check-added-large-files
         description: prevents giant files from being committed.
@@ -58,3 +65,10 @@ repos:
         entry: trailing-whitespace-fixer
         name: Trailing whitespace
         language: system
+
+      - id: graph-visualization
+        description: Visualizes the project structure
+        entry: bash -c "make gViz"
+        name: GraphVisualization
+        language: system
+        pass_filenames: false

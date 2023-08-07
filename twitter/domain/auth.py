@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from .types import URL
@@ -6,21 +6,21 @@ from .types import URL
 
 @dataclass
 class User:
-    id: int
+    email: str
     first_name: str
     last_name: str
     username: str
-    is_active: bool
-    is_verified: bool
+    is_active: bool = False
+    is_superuser: bool = False
 
 
 @dataclass
 class Profile:
-    user_id: int
-    photo: URL # url to photo
-    background_photo: URL # url to profile background photo
-    description: str
-    date_joined: datetime
+    user: User
+    photo: URL | None # url to photo
+    background_photo: URL | None # url to profile background photo
+    description: str | None
+    date_joined: datetime = field(default_factory=datetime.now)
 
 
 @dataclass
