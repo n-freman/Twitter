@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "twitter"
+version = "0.1.0"
+description = "Fully featured twitter core clone"
+authors = ["n-freman <nazarannanazarov@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+sqlalchemy = "^2.0.17"
+alembic = "^1.11.1"
+psycopg2-binary = "^2.9.6"
+pydantic = {extras = ["email"], version = "^2.1.1"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+pika = "^1.3.2"
+redis = "^4.6.0"
+pyotp = "^2.9.0"
+tenacity = "^8.2.2"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.12.0"
+ruff = "^0.0.272"
+pytest = "^7.3.2"
+coverage = "^7.2.7"
+pre-commit = "^3.3.3"
+pre-commit-hooks = "^4.4.0"
+httpx = "^0.24.1"
+
+
+[tool.poetry.group.fastapi.dependencies]
+fastapi = "^0.100.0"
+uvicorn = {extras = ["standard"], version = "^0.23.1"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.coverage.run]
+command_line = "-m twitter"
+
+[tool.isort]
+extend_skip = [".md", ".json"]

@@ -19,3 +19,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.ruff_cache
+htmlcov/*
+.pytest_cache
+.coverage
+.DS_Store
+db.sqlite3
+*.dot

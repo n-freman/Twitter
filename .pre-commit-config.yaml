@@ -1,0 +1,80 @@
+default_language_version:
+  python: python3.11
+
+default_stages: [commit, push]
+
+repos:
+  - repo: local
+    hooks:
+      # https://github.com/pre-commit/pre-commit-hooks#check-ast
+      - id: check-ast
+        description: Simply checks whether the files parse as valid python.
+        entry: check-ast
+        name: Check python syntax
+        language: system
+        types: [python]
+
+      - id: isort
+        description: Sort & format imports in propper way
+        entry: isort
+        name: Check imports order
+        language: system
+        types: [python]
+
+      # https://github.com/pre-commit/pre-commit-hooks#check-added-large-files
+      - id: check-added-large-files
+        description: prevents giant files from being committed.
+        entry: check-added-large-files
+        name: Check added large files
+        language: system
+
+      # https://github.com/pre-commit/pre-commit-hooks#check-json
+      - id: check-json
+        description: Checks json files for parseable syntax.
+        entry: check-json
+        name: Check JSON
+        language: system
+        types: [json]
+
+      # https://github.com/pre-commit/pre-commit-hooks#check-toml
+      - id: check-toml
+        description: Checks toml files for parseable syntax.
+        entry: check-toml
+        name: Check TOML
+        language: system
+        types: [toml]
+
+      # https://github.com/pre-commit/pre-commit-hooks#check-yaml
+      - id: check-yaml
+        description: Checks yaml files for parseable syntax.
+        entry: check-yaml
+        name: Check YAML
+        language: system
+        types: [yaml]
+
+      # https://github.com/pre-commit/pre-commit-hooks#end-of-file-fixer
+      - id: end-of-file-fixer
+        description: Ensures that a file is either empty, or ends with one newline.
+        entry: end-of-file-fixer
+        name: End of file fixer
+        language: system
+        types:
+          - python
+          - yaml
+          - toml
+          - json
+
+      # https://github.com/pre-commit/pre-commit-hooks#trailing-whitespace
+      - id: trailing-whitespace
+        description: Trims trailing whitespace.
+        entry: trailing-whitespace-fixer
+        name: Trailing whitespace
+        language: system
+        types: [python, yaml, toml, json]
+
+      - id: graph-visualization
+        description: Visualizes the project structure
+        entry: bash -c "make gViz"
+        name: GraphVisualization
+        language: system
+        pass_filenames: false
