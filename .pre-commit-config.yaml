@@ -58,6 +58,11 @@ repos:
         entry: end-of-file-fixer
         name: End of file fixer
         language: system
+        types:
+          - python
+          - yaml
+          - toml
+          - json
 
       # https://github.com/pre-commit/pre-commit-hooks#trailing-whitespace
       - id: trailing-whitespace
@@ -65,6 +70,7 @@ repos:
         entry: trailing-whitespace-fixer
         name: Trailing whitespace
         language: system
+        types: [python, yaml, toml, json]
 
       - id: graph-visualization
         description: Visualizes the project structure

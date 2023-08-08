@@ -1,6 +1,9 @@
+import re
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, FileUrl, SecretStr
+from pydantic.functional_validators import AfterValidator
+from typing_extensions import Annotated
 
 
 class UserSchema(BaseModel):
@@ -34,3 +37,17 @@ class TokenSchema(BaseModel):
 
 class TokenDataSchema(BaseModel):
     username: str | None = None
+
+
+def verify_otp(value: str) -> str:
+    pattern = '\d{6}'
+    assert re.match(pattern, value) is not None, f'{value} is not otp'
+    return value
+
+
+OTP = Annotated[str, AfterValidator(verify_otp)]
+
+
+class VerifyEmailSchema(BaseModel):
+    email: EmailStr
+    otp: OTP

@@ -1,10 +1,12 @@
+from typing import List
+
 from ...domain.auth import User
 from .abstract import AbstractSQLAlchemyRepository
 
 
 class UserRepository(AbstractSQLAlchemyRepository):
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> User:
         return self.session.query(User).filter(*args, **kwargs).first()
 
     def add(self, user: User):

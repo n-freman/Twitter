@@ -1,6 +1,8 @@
 import ssl
 from smtplib import SMTP
 
+from tenacity import retry, stop_after_attempt
+
 from .abstract import AbstractMailService
 
 
@@ -17,19 +19,13 @@ class SMTPMailService(AbstractMailService):
         self.password = password
         self.sender = sender
 
-
+    @retry(stop=stop_after_attempt(10))
     def send(self, message: str, receiver: str) -> bool:
-        print('[SMTPSERVICE]  ', message, receiver, flush=True)
-        try:
-            context = ssl.create_default_context()
-            with SMTP(self.host, self.port) as smtp_server:
-                smtp_server.starttls(context=context)
-                smtp_server.login(self.sender, self.password)
-                smtp_server.sendmail(self.sender, [receiver], message)
-        except Exception as e:
-            return False
-        else:
-            return True
+        context = ssl.create_default_context()
+        with SMTP(self.host, self.port) as smtp_server:
+            smtp_server.starttls(context=context)
+            smtp_server.login(self.sender, self.password)
+            smtp_server.sendmail(self.sender, [receiver], message)
 
     def __str__(self):
         return f'MailService({self.host}, {self.port}, {self.password}, {self.sender})'

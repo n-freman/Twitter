@@ -17,7 +17,6 @@ class RedisSubscriber(RedisAdapter):
 
     def listen(self):
         for message in self.__subscriber.listen():
-            print(message, flush=True)
             if message['type'] == 'subscribe':
                 continue
             try:

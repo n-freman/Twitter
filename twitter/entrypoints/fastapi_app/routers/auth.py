@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response
 
 from ....config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
 from ....domain.auth import Profile, User
-from ....presentation.schemas.auth import UserCreateSchema
+from ....presentation.schemas.auth import UserCreateSchema, VerifyEmailSchema
 from ....services.auth import otp
 from ....services.email.publisher import RedisPublisher
 from ....services.unit_of_work import SqlAlchemyUnitOfWork
@@ -22,7 +22,10 @@ async def register(data: UserCreateSchema):
     Route for registering new users
     '''
     with SqlAlchemyUnitOfWork() as uow:
-        user = uow.users.get((User.email == data.email) | (User.username == data.username))
+        user = uow.users.get(
+            (User.email == data.email) \
+            | (User.username == data.username)
+        )
         if user is not None:
             return Response(
                 content=json.dumps({
@@ -34,7 +37,8 @@ async def register(data: UserCreateSchema):
                                 'username',
                                 'email'
                             ],
-                            'msg': "User with such username or email already exists"
+                            'msg': ("User with such"
+                                "username or email already exists")
                         }
                     ]
                 }),
@@ -64,3 +68,42 @@ async def register(data: UserCreateSchema):
             }
         )
     return {'status': 200}
+
+
+@router.post('/verify-email')
+async def register(data: VerifyEmailSchema):
+    with SqlAlchemyUnitOfWork() as uow:
+        user = uow.users.get(User.email == data.email)
+        print(user)
+        if user is None:
+            return Response(
+                content=json.dumps({
+                    'detail': [
+                        {
+                            "type":  "user_doesnt_exist",
+                            "loc": ['email'],
+                            'msg': ("User with such"
+                                " email doesn't exist")
+                        }
+                    ]
+                }),
+                status_code=400
+            )
+        if user.is_active:
+            return Response(
+                content=json.dumps({
+                    'detail': [
+                        {
+                            "type":  "user_active",
+                            "loc": ['email'],
+                            'msg': ("User with such"
+                                " email was already activated")
+                        }
+                    ]
+                }),
+                status_code=400
+            )
+        user.is_active = True
+        uow.users.add(user)
+        uow.commit()
+    return {'detail': 'Successfully activated'}
