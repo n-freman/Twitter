@@ -10,7 +10,7 @@ REDIS_EMAIL_VER_CHANNEL = os.environ.get(
     'REDIS_EMAIL_VER_CHANNEL', 'email-verification'
 )
 OTP_KEY_EXPIRY_TIME = os.environ.get(
-    'OTP_KEY_EXPIRY_TIME', 120
+    'OTP_KEY_EXPIRY_TIME', 7200
 )
 
 
