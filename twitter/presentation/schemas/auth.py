@@ -51,3 +51,8 @@ OTP = Annotated[str, AfterValidator(verify_otp)]
 class VerifyEmailSchema(BaseModel):
     email: EmailStr
     otp: OTP
+
+
+class LoginSchema(BaseModel):
+    email: EmailStr
+    password: SecretStr

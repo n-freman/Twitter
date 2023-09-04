@@ -3,6 +3,8 @@ from datetime import datetime
 
 from .types import URL
 
+# from ..services.auth import get_password_hash, verify_password
+
 
 @dataclass
 class User:
@@ -12,6 +14,13 @@ class User:
     username: str
     is_active: bool = False
     is_superuser: bool = False
+    password: str | None = None
+
+    # def set_password(self, password: str) -> None:
+    #     self.password = get_password_hash(password)
+    
+    # def verify_password(self, password):
+    #     return verify_password(password, self.password)
 
 
 @dataclass
