@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from ... import config
+from ...domain.auth import User
 from ...presentation.schemas import auth
 from ...services.unit_of_work import SqlAlchemyUnitOfWork
 
@@ -13,11 +14,15 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, user: User):
+    return pwd_context.verify(plain_password, user.password)
 
 
-def get_password_hash(password):
+def set_user_password(plain_password: str, user: User):
+    user.password = get_password_hash(plain_password)
+
+
+def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 

@@ -16,6 +16,7 @@ user_table = Table(
     Column("first_name", String(120), nullable=False),
     Column("last_name", String(120), nullable=False),
     Column("username", String(120), unique=True, nullable=False),
+    Column("password", Text, nullable=False),
     Column("is_active", Boolean, default=False),
     Column("is_superuser", Boolean, default=False)
 )
@@ -168,7 +169,7 @@ def create_tables():
         create_engine(
             config.get_postgres_uri(),
             isolation_level="REPEATABLE READ",
-        )
+        ),
     )
 
 

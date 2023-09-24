@@ -6,7 +6,7 @@ from ....config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
 from ....domain.auth import Profile, User
 from ....presentation.schemas.auth import (LoginSchema, UserCreateSchema,
                                            VerifyEmailSchema)
-from ....services.auth import otp
+from ....services.auth import otp, set_user_password, verify_password
 from ....services.email.publisher import RedisPublisher
 from ....services.unit_of_work import SqlAlchemyUnitOfWork
 
@@ -57,11 +57,10 @@ async def register(data: UserCreateSchema):
             background_photo=data.background_photo,
             description=data.description,
         )
-        user.set_password(data.password)
+        set_user_password(data.password, user)
         uow.users.add(user)
         uow.profile.add(profile)
         uow.commit()
-        print(REDIS_EMAIL_VER_CHANNEL)
         redis_publisher.publish(
             REDIS_EMAIL_VER_CHANNEL,
             {
@@ -73,7 +72,7 @@ async def register(data: UserCreateSchema):
 
 
 @router.post('/verify-email')
-async def register(data: VerifyEmailSchema):
+async def verify_email(data: VerifyEmailSchema):
     with SqlAlchemyUnitOfWork() as uow:
         user = uow.users.get(User.email == data.email)
         if user is None:
@@ -128,4 +127,8 @@ async def login(data: LoginSchema):
                 }),
                 status_code=400
             )
-        
+        if verify_password(data.password, user):
+            password = otp.get_otp(user.email)
+            return {
+                'access_token': password
+            }
