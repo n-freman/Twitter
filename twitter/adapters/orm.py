@@ -1,6 +1,17 @@
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey,
-                        ForeignKeyConstraint, Integer, Interval, MetaData,
-                        String, Table, Text, create_engine)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    Interval,
+    MetaData,
+    String,
+    Table,
+    Text,
+    create_engine
+)
 from sqlalchemy.orm import registry, relationship, sessionmaker
 
 from .. import config, domain

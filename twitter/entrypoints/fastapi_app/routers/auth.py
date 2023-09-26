@@ -4,8 +4,11 @@ from fastapi import APIRouter, Response
 
 from ....config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
 from ....domain.auth import Profile, User
-from ....presentation.schemas.auth import (LoginSchema, UserCreateSchema,
-                                           VerifyEmailSchema)
+from ....presentation.schemas.auth import (
+    LoginSchema,
+    UserCreateSchema,
+    VerifyEmailSchema
+)
 from ....services.auth import otp, set_user_password, verify_password
 from ....services.email.publisher import RedisPublisher
 from ....services.unit_of_work import SqlAlchemyUnitOfWork
