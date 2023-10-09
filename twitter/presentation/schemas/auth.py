@@ -48,6 +48,10 @@ def verify_otp(value: str) -> str:
 OTP = Annotated[str, AfterValidator(verify_otp)]
 
 
+class ResendVerificationSchema(BaseModel):
+    email: EmailStr
+
+
 class VerifyEmailSchema(BaseModel):
     email: EmailStr
     otp: OTP
@@ -56,3 +60,7 @@ class VerifyEmailSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: EmailStr
     password: SecretStr
+
+
+class RefreshSchema(BaseModel):
+    token: SecretStr
