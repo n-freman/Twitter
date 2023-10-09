@@ -1,5 +1,3 @@
-from typing import List
-
 from ...domain.auth import User
 from .abstract import AbstractSQLAlchemyRepository
 

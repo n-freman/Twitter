@@ -147,7 +147,11 @@ answer_table = Table(
     metadata,
     Column("id", Integer, autoincrement=True, primary_key=True),
     Column("user_id", ForeignKey("users.id", ondelete='cascade')),
-    Column("poll_id", ForeignKey("poll.tweet_id", ondelete='CASCADE'), primary_key=True),
+    Column(
+        "poll_id",
+        ForeignKey("poll.tweet_id", ondelete='CASCADE'),
+        primary_key=True
+    ),
     Column("choice_number", Integer, primary_key=True),
     Column("date_created", DateTime),
     ForeignKeyConstraint(

@@ -4,14 +4,19 @@ SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'somehow_really_complicated_secret_key_with_signs_like:!@#$%^&*()-_=+'
 )
+REFRESH_KEY = os.environ.get(
+    'REFRESH_KEY',
+    'somehow_really_complicated_secret_key_with_signs_like:!@#$%^&*()-_='
+)
 HASHING_ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRES = 15
+REFRESH_TOKEN_EXPIRES = ACCESS_TOKEN_EXPIRES * 10
 REDIS_EMAIL_VER_CHANNEL = os.environ.get(
     'REDIS_EMAIL_VER_CHANNEL', 'email-verification'
 )
-OTP_KEY_EXPIRY_TIME = os.environ.get(
+OTP_KEY_EXPIRY_TIME = int(os.environ.get(
     'OTP_KEY_EXPIRY_TIME', 7200
-)
+))
 
 
 def get_postgres_uri():

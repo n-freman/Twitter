@@ -8,13 +8,19 @@ from ...config import OTP_KEY_EXPIRY_TIME, SECRET_KEY
 
 def get_otp(email: str) -> str:
     key = base64.b32encode(generate_key(email).encode())
-    OTP = pyotp.TOTP(key, interval=OTP_KEY_EXPIRY_TIME)
+    OTP = pyotp.TOTP(
+        key,
+        interval=OTP_KEY_EXPIRY_TIME
+    )
     return OTP.now()
 
 
 def verify_otp(email: str, otp: str) -> bool:
     key = base64.b32encode(generate_key(email).encode())
-    OTP = pyotp.TOTP(key, interval=OTP_KEY_EXPIRY_TIME)
+    OTP = pyotp.TOTP(
+        key,
+        interval=OTP_KEY_EXPIRY_TIME
+    )
     return OTP.verify(otp)
 
 

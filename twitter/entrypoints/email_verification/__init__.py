@@ -4,7 +4,6 @@ from ...config import (
     get_redis_uri,
     get_smtp_service_credentials
 )
-from ...services.email.fake import FakeMailService
 from ...services.email.smtp_mail_service import SMTPMailService
 from ...services.email.subscriber import RedisSubscriber
 

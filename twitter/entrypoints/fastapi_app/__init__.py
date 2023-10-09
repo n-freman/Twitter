@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 
 from ...bootstrap import bootstrap
-from .routers import auth
 
 bootstrap()
+
+from .routers import auth
 
 app = FastAPI(title="Twitter Clone API")
 
