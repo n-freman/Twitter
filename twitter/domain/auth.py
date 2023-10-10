@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
 from .types import URL
 
@@ -13,6 +14,7 @@ class User:
     is_active: bool = False
     is_superuser: bool = False
     password: str | None = None
+    id: Optional[int] = None
 
 
 

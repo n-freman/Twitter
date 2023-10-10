@@ -72,7 +72,7 @@ async def register(data: UserCreateSchema):
         )
         set_user_password(data.password.get_secret_value(), user)
         uow.users.add(user)
-        uow.profile.add(profile)
+        uow.profiles.add(profile)
         uow.commit()
         redis_publisher.publish(
             REDIS_EMAIL_VER_CHANNEL,

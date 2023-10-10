@@ -1,19 +1,20 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
 from .types import URL
 
 
 @dataclass
 class Tweet:
-    id: int
     user_id: int
     content: str
-    date_created: datetime
-    date_edited: datetime
-    quote_of: int | None = None # ID of tweet which is quoted by current tweet
-    reply_to: int | None = None # ID of tweet to which this one replies
-    previous_on_thread: int | None = None # ID of previous tweet on thread
+    date_created: datetime = field(default_factory=datetime.now)
+    date_edited: datetime = field(default_factory=datetime.now)
+    quote_of: Optional[int] = None # ID of tweet which is quoted by current tweet
+    reply_to: Optional[int] = None # ID of tweet to which this one replies
+    previous_on_thread: Optional[int] = None # ID of previous tweet on thread
+    id: Optional[int] = None
 
 
 @dataclass

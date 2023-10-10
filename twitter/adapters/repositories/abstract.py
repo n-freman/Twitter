@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy.orm import Session
+
 
 class AbstractRepository(ABC):
 
@@ -18,5 +20,5 @@ class AbstractRepository(ABC):
 
 class AbstractSQLAlchemyRepository(AbstractRepository):
 
-    def __init__(self, session):
+    def __init__(self, session: Session):
         self.session = session

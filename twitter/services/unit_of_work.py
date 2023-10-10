@@ -4,7 +4,11 @@ from typing import Self
 from sqlalchemy.orm import Session
 
 from ..adapters.orm import DEFAULT_SESSION_FACTORY
-from ..adapters.repositories import ProfileRepository, UserRepository
+from ..adapters.repositories import (
+    ProfileRepository,
+    TweetRepository,
+    UserRepository
+)
 
 
 class AbstractUnitOfWork(ABC):
@@ -34,7 +38,8 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     def __enter__(self):
         self.session: Session = self.session_factory()
         self.users = UserRepository(session=self.session)
-        self.profile = ProfileRepository(session=self.session)
+        self.profiles = ProfileRepository(session=self.session)
+        self.tweets = TweetRepository(session=self.session)
         return super().__enter__()
 
     def __exit__(self, *args):

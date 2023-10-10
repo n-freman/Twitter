@@ -3,16 +3,16 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class CreateTweetSchema(BaseModel):
+class TweetSchema(BaseModel):
     content: str
-    quote_of: Optional[int]
-    reply_to: Optional[int]
-    previous_on_threa: Optional[int]
 
 
-class DeleteTweetSchema(BaseModel):
-    tweet_id: int
+class CreateTweetSchema(TweetSchema):
+    content: str
+    quote_of: Optional[int] = None
+    reply_to: Optional[int] = None
+    previous_on_thread: Optional[int] = None
 
 
-class UpdateTweetSchema(CreateTweetSchema):
-    tweet_id: int
+class UpdateTweetSchema(TweetSchema):
+    pass

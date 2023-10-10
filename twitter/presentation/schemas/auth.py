@@ -15,6 +15,7 @@ class UserSchema(BaseModel):
 
 
 class UserInDBSchema(UserSchema):
+    id: int
     is_active: bool
     is_superuser: bool
 

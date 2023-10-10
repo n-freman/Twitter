@@ -90,7 +90,7 @@ def create_jwt_token(email: str, refresh=False):
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     refresh: bool = False
-):
+) -> auth.UserInDBSchema:
     '''
     :param exp: check expiration time
     '''
@@ -117,7 +117,7 @@ async def get_current_user(
 
 async def get_current_active_user(
         current_user: auth.UserInDBSchema = Depends(get_current_user)
-):
+) -> auth.UserInDBSchema:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
