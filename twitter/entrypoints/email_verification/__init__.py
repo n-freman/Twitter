@@ -7,7 +7,7 @@ from ...config import (
 from ...services.email.smtp_mail_service import SMTPMailService
 from ...services.email.subscriber import RedisSubscriber
 
-bootstrap(False, False, True)
+bootstrap(False, False)
 
 
 subscriber = RedisSubscriber(
