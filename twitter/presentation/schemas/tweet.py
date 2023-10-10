@@ -16,3 +16,7 @@ class CreateTweetSchema(TweetSchema):
 
 class UpdateTweetSchema(TweetSchema):
     pass
+
+
+class TweetResponseSchema(CreateTweetSchema):
+    pass

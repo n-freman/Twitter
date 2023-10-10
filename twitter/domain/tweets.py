@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
+from .auth import User
 from .types import URL
 
 
@@ -15,6 +16,9 @@ class Tweet:
     reply_to: Optional[int] = None # ID of tweet to which this one replies
     previous_on_thread: Optional[int] = None # ID of previous tweet on thread
     id: Optional[int] = None
+
+    def belongs_to(self, user: User) -> bool:
+        return self.user_id == user.id
 
 
 @dataclass
