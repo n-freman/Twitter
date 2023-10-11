@@ -1,4 +1,4 @@
-from base import client
+from .base import client
 
 
 def test_startup():

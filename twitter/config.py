@@ -1,5 +1,7 @@
 import os
 
+from twitter.services import email
+
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'somehow_really_complicated_secret_key_with_signs_like:!@#$%^&*()-_=+'
@@ -17,6 +19,7 @@ REDIS_EMAIL_VER_CHANNEL = os.environ.get(
 OTP_KEY_EXPIRY_TIME = int(os.environ.get(
     'OTP_KEY_EXPIRY_TIME', 7200
 ))
+EMAIL_PUBLISHER = email.FakePublisher
 
 
 def get_postgres_uri():

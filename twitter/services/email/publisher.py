@@ -20,3 +20,14 @@ class RedisPublisher(AbstractPublisher, RedisAdapter):
     def publish(self, channel: str, message: Message):
         print('Publishing: ', message)
         self._redis_client.publish(channel, json.dumps(message))
+
+
+class FakePublisher(AbstractPublisher):
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def publish(self, channel: str, message):
+        print(f'{channel=}')
+        print(f'{message=}')
+        return 'works'

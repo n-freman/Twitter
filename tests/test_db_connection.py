@@ -1,8 +1,9 @@
-import base
 from sqlalchemy.sql import text
 
 from twitter.adapters.orm import metadata
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
+
+from . import base
 
 
 def test_db_connection():

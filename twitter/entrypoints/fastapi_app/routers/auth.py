@@ -2,7 +2,7 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 
-from ....config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
+from ....config import EMAIL_PUBLISHER, REDIS_EMAIL_VER_CHANNEL, get_redis_uri
 from ....domain.auth import Profile, User
 from ....presentation.schemas.auth import (
     LoginSchema,
@@ -27,7 +27,7 @@ router = APIRouter(
     prefix='/auth',
     tags=['Authentification']
 )
-redis_publisher = RedisPublisher(*get_redis_uri())
+redis_publisher = EMAIL_PUBLISHER(*get_redis_uri())
 
 
 @router.post('/register')
