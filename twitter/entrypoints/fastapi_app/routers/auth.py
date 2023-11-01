@@ -1,17 +1,17 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response
 
-from ....config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
-from ....domain.auth import Profile, User
-from ....presentation.schemas.auth import (
+from twitter.config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
+from twitter.domain.auth import Profile, User
+from twitter.presentation.schemas.auth import (
     LoginSchema,
     RefreshSchema,
     ResendVerificationSchema,
     UserCreateSchema,
     VerifyEmailSchema
 )
-from ....services.auth import (
+from twitter.services.auth import (
     authenticate_user,
     create_jwt_token,
     get_current_user,
@@ -19,9 +19,9 @@ from ....services.auth import (
     set_user_password,
     verify_refresh_token
 )
-from ....services.auth.otp import verify_otp
-from ....services.email.publisher import RedisPublisher
-from ....services.unit_of_work import SqlAlchemyUnitOfWork
+from twitter.services.auth.otp import verify_otp
+from twitter.services.email.publisher import RedisPublisher
+from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 router = APIRouter(
     prefix='/auth',
