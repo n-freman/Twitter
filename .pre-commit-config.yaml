@@ -72,9 +72,9 @@ repos:
         language: system
         types: [python, yaml, toml, json]
 
-      - id: graph-visualization
-        description: Visualizes the project structure
-        entry: bash -c "make gViz"
-        name: GraphVisualization
-        language: system
-        pass_filenames: false
+      # - id: graph-visualization
+      #   description: Visualizes the project structure
+      #   entry: bash -c "make gViz"
+      #   name: GraphVisualization
+      #   language: system
+      #   pass_filenames: false

@@ -21,6 +21,10 @@ OTP_KEY_EXPIRY_TIME = int(os.environ.get(
 ))
 EMAIL_PUBLISHER = email.FakePublisher
 
+ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 
 def get_postgres_uri():
     host = os.environ.get("DB_HOST", "db")
