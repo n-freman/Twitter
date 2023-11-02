@@ -27,7 +27,7 @@ router = APIRouter(
     prefix='/auth',
     tags=['Authentification']
 )
-redis_publisher = EMAIL_PUBLISHER(*get_redis_uri())
+redis_publisher = RedisPublisher(*get_redis_uri())
 
 
 @router.post('/register')
