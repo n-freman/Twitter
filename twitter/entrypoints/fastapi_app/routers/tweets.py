@@ -70,3 +70,9 @@ def update_tweet(
         uow.tweets.add(tweet)
         uow.commit()
         return TweetResponseSchema(**asdict(Tweet))
+
+
+@router.get('')
+def get_tweets():
+    with SqlAlchemyUnitOfWork(uow) as uow:
+        return []
