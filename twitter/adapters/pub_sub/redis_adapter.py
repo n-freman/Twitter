@@ -9,3 +9,4 @@ class RedisAdapter:
             port=port,
             decode_responses=decode_responses
         )
+

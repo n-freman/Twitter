@@ -50,3 +50,6 @@ command_line = "-m twitter"
 [tool.isort]
 extend_skip = [".md", ".json"]
 multi_line_output = 3
+
+[virtualenvs]
+in-project = true

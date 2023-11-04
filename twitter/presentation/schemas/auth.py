@@ -20,6 +20,12 @@ class UserInDBSchema(UserSchema):
     is_superuser: bool
 
 
+class UserResponseSchema(UserSchema):
+    is_superuser: bool
+    access_token: str
+    refresh_token: str
+
+
 class ProfileSchema(BaseModel):
     description: str
     photo: FileUrl | None = None
@@ -65,3 +71,4 @@ class LoginSchema(BaseModel):
 
 class RefreshSchema(BaseModel):
     token: SecretStr
+

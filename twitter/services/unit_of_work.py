@@ -51,3 +51,4 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def rollback(self):
         self.session.rollback()
+

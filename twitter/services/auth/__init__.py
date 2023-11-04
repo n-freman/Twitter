@@ -21,8 +21,23 @@ credential_exception = HTTPException(
 )
 
 
-def verify_password(plain_password: str, user: auth.UserInDBSchema):
-    return pwd_context.verify(plain_password, user.password.get_secret_value())
+async def get_refresh_token_user(token: str) -> auth.UserInDBSchema:
+    try:
+        payload = get_payload(token, config.REFRESH_KEY)
+        user = get_user(payload.get('user_email'))
+        return user
+    except JWTError:
+        raise credential_exception
+
+
+def verify_password(
+    plain_password: str,
+    user: auth.UserInDBSchema
+) -> bool:
+    return pwd_context.verify(
+        plain_password,
+        user.password.get_secret_value()
+    )
 
 
 def set_user_password(plain_password: str, user: User):
@@ -35,8 +50,11 @@ def get_password_hash(password: str):
 
 def get_user(email: str):
     with SqlAlchemyUnitOfWork() as uow:
+        user = uow.users.get(User.email==email)
+        if user is None:
+            return None
         user = auth.UserInDBSchema(
-            **asdict(uow.users.get(User.email==email))
+            **asdict(user)
         )
         return user
 
@@ -55,18 +73,6 @@ def authenticate_user(email: str, password: str):
     ):
         raise auth_exception
     return user
-
-
-def verify_refresh_token(token):
-    try:
-        jwt.decode(
-            token,
-            config.REFRESH_KEY,
-            algorithms=[config.HASHING_ALGORITHM],
-            options={'verify_signature': True}
-        )
-    except JWTError:
-        raise credential_exception
 
 
 def create_jwt_token(email: str, refresh=False):
@@ -89,18 +95,9 @@ def create_jwt_token(email: str, refresh=False):
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    refresh: bool = False
 ) -> auth.UserInDBSchema:
-    '''
-    :param exp: check expiration time
-    '''
     try:
-        payload = jwt.decode(
-            token,
-            config.REFRESH_KEY if refresh else config.SECRET_KEY,
-            algorithms=[config.HASHING_ALGORITHM],
-            options={'verify_signature': True}
-        )
+        payload = get_payload(token, config.SECRET_KEY)
         email: str = payload.get('user_email')
         if email is None:
             raise credential_exception
@@ -116,8 +113,17 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-        current_user: auth.UserInDBSchema = Depends(get_current_user)
+    current_user: auth.UserInDBSchema = Depends(get_current_user)
 ) -> auth.UserInDBSchema:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+def get_payload(token: str, secret_key: str):
+    payload = jwt.decode(
+        token,
+        secret_key,
+        algorithms=[config.HASHING_ALGORITHM],
+    )
+    return payload

@@ -9,15 +9,15 @@ from twitter.presentation.schemas.auth import (
     RefreshSchema,
     ResendVerificationSchema,
     UserCreateSchema,
+    UserResponseSchema,
     VerifyEmailSchema
 )
 from twitter.services.auth import (
     authenticate_user,
     create_jwt_token,
-    get_current_user,
+    get_refresh_token_user,
     otp,
-    set_user_password,
-    verify_refresh_token
+    set_user_password
 )
 from twitter.services.auth.otp import verify_otp
 from twitter.services.email.publisher import RedisPublisher
@@ -152,28 +152,25 @@ async def verify_email(data: VerifyEmailSchema):
 
 
 @router.post('/login')
-async def login(data: LoginSchema):
+async def login(data: LoginSchema) -> UserResponseSchema:
     user = authenticate_user(
         email=data.email,
         password=data.password.get_secret_value()
     )
     access_token = create_jwt_token(user.email)
     refresh_token = create_jwt_token(user.email, refresh=True)
-    return {
-        'access_token': access_token,
-        'refresh_token': refresh_token
-    }
+    return UserResponseSchema(
+        **user.model_dump(),
+        access_token=access_token,
+        refresh_token=refresh_token
+    )
 
 
 @router.post('/refresh')
 async def refresh(
     data: RefreshSchema,
 ):
-    user = await get_current_user(
-        data.token.get_secret_value(),
-        refresh=True
-    )
-    verify_refresh_token(data.token.get_secret_value())
+    user = await get_refresh_token_user(data.token.get_secret_value())
     access_token = create_jwt_token(user.email)
     refresh_token = create_jwt_token(user.email, refresh=True)
     return {

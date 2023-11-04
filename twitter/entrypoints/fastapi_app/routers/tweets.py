@@ -13,7 +13,10 @@ from twitter.presentation.schemas.tweet import (
 from twitter.services.auth import get_current_active_user
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
-router = APIRouter(prefix='/tweets')
+router = APIRouter(
+    prefix='/tweets',
+    tags=['Tweets'],
+)
 
 
 @router.post('/create')

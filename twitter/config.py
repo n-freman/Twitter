@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get(
 )
 REFRESH_KEY = os.environ.get(
     'REFRESH_KEY',
-    'somehow_really_complicated_secret_key_with_signs_like:!@#$%^&*()-_='
+    'somehow_really_complicated_secret_key_with_signs_like:!@#$%^&*()-_'
 )
 HASHING_ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRES = 15
