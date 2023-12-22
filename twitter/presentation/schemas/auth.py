@@ -72,3 +72,7 @@ class LoginSchema(BaseModel):
 class RefreshSchema(BaseModel):
     token: SecretStr
 
+
+class JWTSchema(BaseModel):
+    token: SecretStr
+

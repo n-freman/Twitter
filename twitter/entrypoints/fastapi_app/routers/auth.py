@@ -2,9 +2,11 @@ import json
 
 from fastapi import APIRouter, HTTPException, Response
 
-from twitter.config import REDIS_EMAIL_VER_CHANNEL, get_redis_uri
+from twitter.adapters.background_tasks import SendEmailTask
+from twitter.config import SECRET_KEY
 from twitter.domain.auth import Profile, User
 from twitter.presentation.schemas.auth import (
+    JWTSchema,
     LoginSchema,
     RefreshSchema,
     ResendVerificationSchema,
@@ -15,20 +17,18 @@ from twitter.presentation.schemas.auth import (
 from twitter.services.auth import (
     authenticate_user,
     create_jwt_token,
+    get_payload,
     get_refresh_token_user,
     otp,
     set_user_password
 )
 from twitter.services.auth.otp import verify_otp
-from twitter.services.email.publisher import RedisPublisher
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 router = APIRouter(
     prefix='/auth',
     tags=['Authentification']
 )
-redis_publisher = RedisPublisher(*get_redis_uri())
-
 
 @router.post('/register')
 async def register(data: UserCreateSchema):
@@ -74,11 +74,10 @@ async def register(data: UserCreateSchema):
         uow.users.add(user)
         uow.profiles.add(profile)
         uow.commit()
-        redis_publisher.publish(
-            REDIS_EMAIL_VER_CHANNEL,
-            {
-                "message": otp.get_otp(user.email),
-                "receiver": user.email
+        SendEmailTask.delay(
+            args={
+                'message':otp.get_otp(user.email),
+                'receiver': user.email
             }
         )
     return {'status': 200}
@@ -98,11 +97,10 @@ async def resend_email_verification(data: ResendVerificationSchema):
                 status_code=400,
                 detail="User already activated"
             )
-        redis_publisher.publish(
-            REDIS_EMAIL_VER_CHANNEL,
-            {
-                "message": otp.get_otp(user.email),
-                "receiver": user.email
+        SendEmailTask.delay(                             
+            args={
+                'message':otp.get_otp(user.email),
+                'receiver': user.email
             }
         )
     return {'status': 200}
@@ -177,3 +175,15 @@ async def refresh(
         'access_token': access_token,
         'refresh_token': refresh_token
     }
+
+
+@router.post('/verify-token')
+async def verify_token(data: JWTSchema):
+    payload = get_payload(
+        data.token.get_secret_value(),
+        SECRET_KEY
+    )
+    if payload:
+        return {'data': 'Ok'}
+    return {'data': 'Bad'}
+

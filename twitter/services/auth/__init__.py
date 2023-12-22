@@ -127,3 +127,4 @@ def get_payload(token: str, secret_key: str):
         algorithms=[config.HASHING_ALGORITHM],
     )
     return payload
+

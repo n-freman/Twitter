@@ -13,13 +13,13 @@ REFRESH_KEY = os.environ.get(
 HASHING_ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRES = 15
 REFRESH_TOKEN_EXPIRES = ACCESS_TOKEN_EXPIRES * 10
-REDIS_EMAIL_VER_CHANNEL = os.environ.get(
-    'REDIS_EMAIL_VER_CHANNEL', 'email-verification'
-)
+
 OTP_KEY_EXPIRY_TIME = int(os.environ.get(
     'OTP_KEY_EXPIRY_TIME', 7200
 ))
-EMAIL_PUBLISHER = email.FakePublisher
+
+EMAIL_SERVICE: email.AbstractMailService = email.FakeMailService # type: ignore
+BROKER_HOST: str = os.environ.get('BROKER_HOST') # type: ignore
 
 ALLOWED_ORIGINS = [
     'http://localhost:3000',
@@ -42,16 +42,9 @@ def get_redis_uri():
 
 
 def get_smtp_service_credentials():
-    host: str = os.environ.get(
-        "EMAIL_HOST"
-    )
-    port: int = os.environ.get(
-        "EMAIL_PORT"
-    )
-    password: str = os.environ.get(
-        "EMAIL_PASSWORD"
-    )
-    sender: str = os.environ.get(
-        "EMAIL_SENDER"
-    )
+    host: str = os.environ.get("EMAIL_HOST") # type: ignore
+    port: int = os.environ.get("EMAIL_PORT") # type: ignore
+    password: str = os.environ.get("EMAIL_PASSWORD") # type: ignore
+    sender: str = os.environ.get("EMAIL_SENDER") # type: ignore
     return host, port, password, sender
+

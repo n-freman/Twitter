@@ -6,7 +6,8 @@ class FakeMailService(AbstractMailService):
     def __init__(self, *args, **kwargs):
         pass
 
-    def send(self, message: str, receiver: str) -> bool:
-        print(f'Receiver: {receiver}')
-        print(f'Message: {message}')
+    def send(self, *args) -> bool:
+        # print(f'Receiver: {receiver}')
+        # print(f'Message: {message}')
+        print(args)
         return True

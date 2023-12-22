@@ -8,3 +8,5 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
 COPY . /code/
+
+EXPOSE 587/tcp
