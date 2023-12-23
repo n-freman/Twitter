@@ -5,6 +5,8 @@ from pydantic import BaseModel, EmailStr, Field, FileUrl, SecretStr
 from pydantic.functional_validators import AfterValidator
 from typing_extensions import Annotated
 
+from twitter.presentation.schemas.base import BaseSchema
+
 
 class UserSchema(BaseModel):
     email: EmailStr
@@ -33,7 +35,7 @@ class ProfileSchema(BaseModel):
     date_joined: datetime = Field(default_factory=datetime.now)
 
 
-class UserCreateSchema(UserSchema, ProfileSchema):
+class UserCreateSchema(BaseSchema, UserSchema, ProfileSchema):
     pass
 
 

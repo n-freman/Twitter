@@ -6,10 +6,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from ... import config
-from ...domain.auth import User
-from ...presentation.schemas import auth
-from ...services.unit_of_work import SqlAlchemyUnitOfWork
+from twitter import config
+from twitter.domain.auth import Profile, User
+from twitter.presentation.schemas import auth
+from twitter.services.auth.exceptions import UserAlreadyExists
+from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
@@ -19,6 +20,44 @@ credential_exception = HTTPException(
     detail='Could not validate credentials',
     headers={'WWW-Authenticate': 'Bearer'}
 )
+
+
+async def register_user(
+    uow,
+    email,
+    username,
+    password,
+    first_name,
+    last_name,
+    photo,
+    background_photo,
+    description,
+    date_joined
+):
+    with uow:
+        user = uow.users.get(
+            (User.email == email) \
+            | (User.username == username)
+        )
+        if user is not None:
+            raise UserAlreadyExists
+        user = User(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            username=username
+        )
+        profile = Profile(
+            user=user,
+            photo=photo,
+            background_photo=background_photo,
+            description=description,
+            date_joined=date_joined
+        )
+        set_user_password(password, user)
+        uow.users.add(user)
+        uow.profiles.add(profile)
+        uow.commit()
 
 
 async def get_refresh_token_user(token: str) -> auth.UserInDBSchema:
