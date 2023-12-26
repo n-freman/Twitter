@@ -9,7 +9,13 @@ from passlib.context import CryptContext
 from twitter import config
 from twitter.domain.auth import Profile, User
 from twitter.presentation.schemas import auth
-from twitter.services.auth.exceptions import UserAlreadyExists
+from twitter.services.auth.exceptions import (
+    OTPVerificationFail,
+    UserAlreadyActive,
+    UserAlreadyExists,
+    UserNotFound
+)
+from twitter.services.auth.otp import verify_otp
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -58,6 +64,20 @@ async def register_user(
         uow.users.add(user)
         uow.profiles.add(profile)
         uow.commit()
+
+
+async def activate_user(uow, email, otp):
+    with uow:
+       user = uow.users.get(User.email == email)
+       if user is None:
+           raise UserNotFound
+       if user.is_active:
+           raise UserAlreadyActive
+       if not verify_otp(email, otp):
+           raise OTPVerificationFail
+       user.is_active = True
+       uow.users.add(user)
+       uow.commit()
 
 
 async def get_refresh_token_user(token: str) -> auth.UserInDBSchema:
