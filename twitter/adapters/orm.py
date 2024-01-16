@@ -194,3 +194,4 @@ DEFAULT_SESSION_FACTORY = sessionmaker(
         isolation_level="REPEATABLE READ",
     )
 )
+

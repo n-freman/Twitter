@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Body, HTTPException, Response
 
 from twitter.adapters.background_tasks import SendEmailTask
 from twitter.config import SECRET_KEY
@@ -21,6 +21,7 @@ from twitter.services.auth import (
     create_jwt_token,
     get_payload,
     get_refresh_token_user,
+    get_user,
     otp,
     register_user,
     set_user_password
@@ -48,12 +49,12 @@ async def register(data: UserCreateSchema):
         await register_user(uow, **data.as_args())
     except UserAlreadyExists:
         return Response(
-            content=auth_messages.user_exists,
+            content=json.dumps(auth_messages.user_exists),
             status_code=400
         ) 
     SendEmailTask.delay(
         args={
-            'message':otp.get_otp(data.email),
+            'message': otp.get_otp(data.email),
             'receiver': data.email
         }
     )
@@ -62,24 +63,25 @@ async def register(data: UserCreateSchema):
 
 @router.post('/resend-email-verification')
 async def resend_email_verification(data: ResendVerificationSchema):
-    with SqlAlchemyUnitOfWork() as uow:
-        user = uow.users.get(User.email == data.email)
-        if not user:
-            raise HTTPException(
-                status_code=400,
-                detail="User with such email not found"
-            )
-        if user.is_active:
-            raise HTTPException(
-                status_code=400,
-                detail="User already activated"
-            )
-        SendEmailTask.delay(                             
-            args={
-                'message': otp.get_otp(user.email),
-                'receiver': user.email
-            }
+    uow = SqlAlchemyUnitOfWork()
+    email = data.email
+    user = get_user(uow, email)
+    if not user:
+        return Response(
+            content=json.dumps(auth_messages.user_not_found),
+            status_code=400
         )
+    if user.is_active:
+        return Response(
+            content=json.dumps(auth_messages.user_already_active),
+            status_code=400
+        )
+    SendEmailTask.delay(                             
+        args={
+            'message': otp.get_otp(user.email),
+            'receiver': user.email
+        }
+    )
     return {'status': 200}
 
 
@@ -92,17 +94,17 @@ async def verify_email(data: VerifyEmailSchema):
         await activate_user(uow, email, otp)
     except UserNotFound:
         return Response(
-            content=auth_messages.user_not_found,
+            content=json.dumps(auth_messages.user_not_found),
             status_code=400
         )
     except UserAlreadyActive:
         return Response(
-            content=auth_messages.user_already_active,
+            content=json.dumps(auth_messages.user_already_active),
             status_code=400
         )
     except OTPVerificationFail:
         return Response(
-            content=auth_messages.otp_verification_fail,
+            content=json.dumps(auth_messages.otp_verification_fail),
             status_code=400
         )
     return {'detail': 'Successfully activated'}
@@ -110,6 +112,7 @@ async def verify_email(data: VerifyEmailSchema):
 
 @router.post('/login')
 async def login(data: LoginSchema) -> UserResponseSchema:
+    print(data)
     user = authenticate_user(
         email=data.email,
         password=data.password.get_secret_value()
@@ -136,7 +139,7 @@ async def refresh(
     }
 
 
-@router.post('/verify-token')
+@router.get('/verify-token')
 async def verify_token(data: JWTSchema):
     payload = get_payload(
         data.token.get_secret_value(),

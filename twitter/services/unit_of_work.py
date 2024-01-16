@@ -3,8 +3,8 @@ from typing import Self
 
 from sqlalchemy.orm import Session
 
-from ..adapters.orm import DEFAULT_SESSION_FACTORY
-from ..adapters.repositories import (
+from twitter.adapters.orm import DEFAULT_SESSION_FACTORY
+from twitter.adapters.repositories import (
     ProfileRepository,
     TweetRepository,
     UserRepository

@@ -79,11 +79,16 @@ async def activate_user(uow, email, otp):
        uow.users.add(user)
        uow.commit()
 
+def get_user(uow, email):
+    with uow:
+        user = uow.users.get(User.email == email)
+        return user
+
 
 async def get_refresh_token_user(token: str) -> auth.UserInDBSchema:
     try:
         payload = get_payload(token, config.REFRESH_KEY)
-        user = get_user(payload.get('user_email'))
+        user = get_user_data(payload.get('user_email'))
         return user
     except JWTError:
         raise credential_exception
@@ -107,7 +112,7 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def get_user(email: str):
+def get_user_data(email: str):
     with SqlAlchemyUnitOfWork() as uow:
         user = uow.users.get(User.email==email)
         if user is None:
@@ -124,7 +129,7 @@ def authenticate_user(email: str, password: str):
         detail='User not found or not activated',
         headers={'WWW-Authenticate': 'Bearer'}
     )
-    user = get_user(email)
+    user = get_user_data(email)
     if (
         not user or 
         not user.is_active or 
@@ -164,7 +169,7 @@ async def get_current_user(
     except JWTError:
         raise credential_exception
 
-    user = get_user(email=email)
+    user = get_user_data(email=email)
     if user is None:
         raise credential_exception
 
