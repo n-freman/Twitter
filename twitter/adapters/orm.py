@@ -162,6 +162,7 @@ answer_table = Table(
 
 
 def start_mappers():
+    print('Starting mappers')
     mapper.map_imperatively(domain.User, user_table)
     mapper.map_imperatively(
         domain.Profile,

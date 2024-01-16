@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+
+  celery:
+    build: ../
+    command: celery -A twitter.entrypoints.celery_app:celery worker
+    depends_on:
+      - rmq
+    environment:
+      - BROKER_HOST=rmq
+    env_file: ../.env
+    volumes:
+      - ..:/code
+      - type: bind
+        source: ../.env
+        target: /envfile/.env
+    ports:
+      - 8091:8091
+  celery_flower:
+    build: ..
+    command: celery -A twitter.entrypoints.celery_app:celery flower
+    volumes:
+      - ..:/code
+    ports:
+      - 5555:5555
+    depends_on:
+      - rmq
+    environment:
+      - BROKER_HOST=rmq
+  db:
+    image: postgres:15
+    ports:
+      - 8080:5432
+    user: postgres
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    healthcheck:
+      test: pg_isready
+  rmq:
+    image: rabbitmq
+    ports:
+      - 5672:5672

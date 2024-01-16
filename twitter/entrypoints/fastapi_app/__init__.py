@@ -25,3 +25,4 @@ app.include_router(tweets.router)
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
