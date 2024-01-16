@@ -28,7 +28,7 @@ ALLOWED_ORIGINS = [
 
 def get_postgres_uri():
     host = os.environ.get("DB_HOST", "db")
-    port = 8080 if host == "localhost" else 5432
+    port = os.environ.get("DB_PORT", 5432)
     password = os.environ.get("DB_PASSWORD", "twitterAdmin123")
     user = os.environ.get("DB_USER",  "twitteradmin")
     db_name = os.environ.get("DB_NAME", "twitter")
