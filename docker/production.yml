@@ -4,7 +4,9 @@ services:
 
   api:
     build: ../
-    command: uvicorn twitter.entrypoints.fastapi_app:app --port 8000 --reload --host 0.0.0.0
+    command: bash -c "
+      alembic -c ./twitter/alembic.ini upgrade head && 
+      uvicorn twitter.entrypoints.fastapi_app:app --port 8000 --reload --host 0.0.0.0"
     ports:
       - 8000:8000
     depends_on:

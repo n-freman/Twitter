@@ -180,15 +180,6 @@ def start_mappers():
     mapper.map_imperatively(domain.Answer, answer_table)
 
 
-def create_tables():
-    metadata.create_all(
-        create_engine(
-            config.get_postgres_uri(),
-            isolation_level="REPEATABLE READ",
-        ),
-    )
-
-
 DEFAULT_SESSION_FACTORY = sessionmaker(
     bind=create_engine(
         config.get_postgres_uri(),
