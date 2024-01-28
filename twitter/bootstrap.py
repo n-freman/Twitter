@@ -10,8 +10,6 @@ def bootstrap(
 ):
     if start_orm:
         orm.start_mappers()
-    if create_tables:
-        orm.create_tables()
     if use_celery:
         from twitter.adapters import background_tasks
     return uow

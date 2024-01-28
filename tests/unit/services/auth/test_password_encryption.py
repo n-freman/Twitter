@@ -1,7 +1,10 @@
 import pytest
 
-from twitter.services.auth import (get_password_hash, set_user_password,
-                                   verify_password)
+from twitter.services.auth import (
+    get_password_hash,
+    set_user_password,
+    verify_password
+)
 
 
 class MockUser:

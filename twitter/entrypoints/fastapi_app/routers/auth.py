@@ -1,12 +1,11 @@
 import json
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Body, HTTPException, Response
 
 from twitter.adapters.background_tasks import SendEmailTask
 from twitter.config import SECRET_KEY
 from twitter.domain.auth import Profile, User
-from twitter.presentation.messages.auth import \
-    user_exists as user_exists_message
+from twitter.presentation.messages import auth as auth_messages
 from twitter.presentation.schemas.auth import (
     JWTSchema,
     LoginSchema,
@@ -17,16 +16,22 @@ from twitter.presentation.schemas.auth import (
     VerifyEmailSchema
 )
 from twitter.services.auth import (
+    activate_user,
     authenticate_user,
     create_jwt_token,
     get_payload,
     get_refresh_token_user,
+    get_user,
     otp,
     register_user,
     set_user_password
 )
-from twitter.services.auth.exceptions import UserAlreadyExists
-from twitter.services.auth.otp import verify_otp
+from twitter.services.auth.exceptions import (
+    OTPVerificationFail,
+    UserAlreadyActive,
+    UserAlreadyExists,
+    UserNotFound
+)
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 router = APIRouter(
@@ -44,12 +49,12 @@ async def register(data: UserCreateSchema):
         await register_user(uow, **data.as_args())
     except UserAlreadyExists:
         return Response(
-            content=user_exists_message,
+            content=json.dumps(auth_messages.user_exists),
             status_code=400
         ) 
     SendEmailTask.delay(
         args={
-            'message':otp.get_otp(data.email),
+            'message': otp.get_otp(data.email),
             'receiver': data.email
         }
     )
@@ -58,72 +63,56 @@ async def register(data: UserCreateSchema):
 
 @router.post('/resend-email-verification')
 async def resend_email_verification(data: ResendVerificationSchema):
-    with SqlAlchemyUnitOfWork() as uow:
-        user = uow.users.get(User.email == data.email)
-        if not user:
-            raise HTTPException(
-                status_code=400,
-                detail="User with such email not found"
-            )
-        if user.is_active:
-            raise HTTPException(
-                status_code=400,
-                detail="User already activated"
-            )
-        SendEmailTask.delay(                             
-            args={
-                'message':otp.get_otp(user.email),
-                'receiver': user.email
-            }
+    uow = SqlAlchemyUnitOfWork()
+    email = data.email
+    user = get_user(uow, email)
+    if not user:
+        return Response(
+            content=json.dumps(auth_messages.user_not_found),
+            status_code=400
         )
+    if user.is_active:
+        return Response(
+            content=json.dumps(auth_messages.user_already_active),
+            status_code=400
+        )
+    SendEmailTask.delay(                             
+        args={
+            'message': otp.get_otp(user.email),
+            'receiver': user.email
+        }
+    )
     return {'status': 200}
 
 
 @router.post('/verify-email')
 async def verify_email(data: VerifyEmailSchema):
-    with SqlAlchemyUnitOfWork() as uow:
-        user = uow.users.get(User.email == data.email)
-        if user is None:
-            return Response(
-                content=json.dumps({
-                    'detail': [
-                        {
-                            "type":  "user_doesnt_exist",
-                            "loc": ['email'],
-                            'msg': ("User with such"
-                                " email doesn't exist")
-                        }
-                    ]
-                }),
-                status_code=400
-            )
-        if user.is_active:
-            return Response(
-                content=json.dumps({
-                    'detail': [
-                        {
-                            "type":  "user_active",
-                            "loc": ['email'],
-                            'msg': ("User with such"
-                                " email was already activated")
-                        }
-                    ]
-                }),
-                status_code=400
-            )
-        if not verify_otp(data.email, data.otp):
-            raise HTTPException(
-                status_code=400,
-                detail="OTP is not valid"
-            )
-        user.is_active = True
-        uow.users.add(user)
-        uow.commit()
+    uow = SqlAlchemyUnitOfWork()
+    email = data.email
+    otp = data.otp
+    try:
+        await activate_user(uow, email, otp)
+    except UserNotFound:
+        return Response(
+            content=json.dumps(auth_messages.user_not_found),
+            status_code=400
+        )
+    except UserAlreadyActive:
+        return Response(
+            content=json.dumps(auth_messages.user_already_active),
+            status_code=400
+        )
+    except OTPVerificationFail:
+        return Response(
+            content=json.dumps(auth_messages.otp_verification_fail),
+            status_code=400
+        )
     return {'detail': 'Successfully activated'}
 
 
 @router.post('/login')
 async def login(data: LoginSchema) -> UserResponseSchema:
+    print(data)
     user = authenticate_user(
         email=data.email,
         password=data.password.get_secret_value()
@@ -150,7 +139,7 @@ async def refresh(
     }
 
 
-@router.post('/verify-token')
+@router.get('/verify-token')
 async def verify_token(data: JWTSchema):
     payload = get_payload(
         data.token.get_secret_value(),

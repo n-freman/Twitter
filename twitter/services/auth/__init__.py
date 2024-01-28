@@ -9,7 +9,13 @@ from passlib.context import CryptContext
 from twitter import config
 from twitter.domain.auth import Profile, User
 from twitter.presentation.schemas import auth
-from twitter.services.auth.exceptions import UserAlreadyExists
+from twitter.services.auth.exceptions import (
+    OTPVerificationFail,
+    UserAlreadyActive,
+    UserAlreadyExists,
+    UserNotFound
+)
+from twitter.services.auth.otp import verify_otp
 from twitter.services.unit_of_work import SqlAlchemyUnitOfWork
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -60,10 +66,29 @@ async def register_user(
         uow.commit()
 
 
+async def activate_user(uow, email, otp):
+    with uow:
+       user = uow.users.get(User.email == email)
+       if user is None:
+           raise UserNotFound
+       if user.is_active:
+           raise UserAlreadyActive
+       if not verify_otp(email, otp):
+           raise OTPVerificationFail
+       user.is_active = True
+       uow.users.add(user)
+       uow.commit()
+
+def get_user(uow, email):
+    with uow:
+        user = uow.users.get(User.email == email)
+        return user
+
+
 async def get_refresh_token_user(token: str) -> auth.UserInDBSchema:
     try:
         payload = get_payload(token, config.REFRESH_KEY)
-        user = get_user(payload.get('user_email'))
+        user = get_user_data(payload.get('user_email'))
         return user
     except JWTError:
         raise credential_exception
@@ -87,7 +112,7 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def get_user(email: str):
+def get_user_data(email: str):
     with SqlAlchemyUnitOfWork() as uow:
         user = uow.users.get(User.email==email)
         if user is None:
@@ -104,7 +129,7 @@ def authenticate_user(email: str, password: str):
         detail='User not found or not activated',
         headers={'WWW-Authenticate': 'Bearer'}
     )
-    user = get_user(email)
+    user = get_user_data(email)
     if (
         not user or 
         not user.is_active or 
@@ -144,7 +169,7 @@ async def get_current_user(
     except JWTError:
         raise credential_exception
 
-    user = get_user(email=email)
+    user = get_user_data(email=email)
     if user is None:
         raise credential_exception
 

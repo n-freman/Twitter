@@ -3,8 +3,10 @@ version: "3"
 services:
 
   api:
-    build: .
-    command: uvicorn twitter.entrypoints.fastapi_app:app --port 8000 --reload --host 0.0.0.0
+    build: ../
+    command: bash -c "
+      alembic -c ./twitter/alembic.ini upgrade head && 
+      uvicorn twitter.entrypoints.fastapi_app:app --port 8000 --reload --host 0.0.0.0"
     ports:
       - 8000:8000
     depends_on:
@@ -12,30 +14,30 @@ services:
       - celery
     environment:
       - BROKER_HOST=rmq
-    env_file: .env
+    env_file: ../.env
     volumes:
-      - .:/code
+      - ..:/code
       - type: bind
-        source: ./.env
+        source: ../.env
         target: /envfile/.env
   celery:
-    build: .
+    build: ../
     command: celery -A twitter.entrypoints.celery_app:celery worker
     depends_on:
       - rmq
     environment:
       - BROKER_HOST=rmq
-    env_file: .env
+    env_file: ../.env
     volumes:
-      - .:/code
+      - ..:/code
       - type: bind
-        source: ./.env
+        source: ../.env
         target: /envfile/.env
   celery_flower:
     build: .
     command: celery -A twitter.entrypoints.celery_app:celery flower
     volumes:
-      - .:/code
+      - ..:/code
     ports:
       - 5555:5555
     depends_on:

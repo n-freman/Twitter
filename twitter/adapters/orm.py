@@ -162,6 +162,7 @@ answer_table = Table(
 
 
 def start_mappers():
+    print('Starting mappers')
     mapper.map_imperatively(domain.User, user_table)
     mapper.map_imperatively(
         domain.Profile,
@@ -179,18 +180,10 @@ def start_mappers():
     mapper.map_imperatively(domain.Answer, answer_table)
 
 
-def create_tables():
-    metadata.create_all(
-        create_engine(
-            config.get_postgres_uri(),
-            isolation_level="REPEATABLE READ",
-        ),
-    )
-
-
 DEFAULT_SESSION_FACTORY = sessionmaker(
     bind=create_engine(
         config.get_postgres_uri(),
         isolation_level="REPEATABLE READ",
     )
 )
+
